@@ -51,17 +51,11 @@ function segment(parameters)
             )
         end
 
-        local type_string = "rms"
+        local types = { "rms", "rms_hann", "mean", "mean_hann" }
 
-        if type == 1 then
-            type_string = "rms_hann"
-        end
-        if type == 2 then
-            type_string = "mean"
-        end
-        if type == 3 then
-            type_string = "mean_hann"
-        end
+        local type_string = types[type + 1]
+
+        utils.DEBUG(type_string)
 
         local file = reacoma.utils.wrap_quotes(data.full_path[i])
         local cached = paths.expandtilde(temp_folder .. utils.name(data.full_path[i]))
@@ -88,7 +82,7 @@ function segment(parameters)
         local retval = reaper.ExecProcess(cmd, 0)
 
         local results = split_results(retval, " ")
-        local result_length = (#results - 1) / 2
+        local result_length = (#results - 1) // 2
 
         --table.insert(data.slice_points_string, reacoma.utils.readfile(data.tmp[i]))
         --reacoma.slicing.process(i, data, true)
