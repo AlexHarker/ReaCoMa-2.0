@@ -140,7 +140,6 @@ imgui_wrapper.loop = function(ctx, viewport, state, obj)
         )
     else
         reaper.ImGui_DestroyContext(ctx)
-        reaper.Undo_EndBlock2(0, obj.info.ext_name, 4)
         reacoma.params.set(obj)
         reaper.SetExtState('reacoma', 'slice_preview', utils.bool_to_string[reacoma.settings.slice_preview], true)
         reaper.SetExtState('reacoma', 'immediate_preview', utils.bool_to_string[reacoma.settings.immediate_preview], true)

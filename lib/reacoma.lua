@@ -118,6 +118,3 @@ if reacoma.output ~= "source" and reacoma.output ~= "media" then
         reacoma.utils.assert(false)
     end
 end
-
-
-reaper.Undo_BeginBlock2(0)
