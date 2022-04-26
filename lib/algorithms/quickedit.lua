@@ -22,7 +22,7 @@ end
 
 function segment(parameters)
 
-    local temp_folder = "~/Desktop/Caches/"
+    local temp_folder = utils.dir_parent(os.tmpname())
 
     local exe = reacoma.utils.wrap_quotes("/usr/local/bin/quickedit")
 
