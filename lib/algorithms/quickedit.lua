@@ -35,8 +35,9 @@ function segment(parameters)
     local search_ms = parameters[6].value
     local hold_ms = parameters[7].value
     local threshold = parameters[8].value
-    local ratio = parameters[9].value
+    local ratio = parameters[9].value / 100.0
     local min_length = parameters[10].value
+    local min_level = parameters[11].value
 
     local recalc = cache_basic_test(parameters)
 
@@ -77,7 +78,8 @@ function segment(parameters)
         " --threshold " .. threshold ..
         " --ratio " .. ratio ..
         " --cache " .. cached ..
-        " --min_length " .. min_length
+        " --min_length " .. min_length ..
+        " --min_level " .. min_level
 
         local retval = reaper.ExecProcess(cmd, 0)
 
@@ -125,7 +127,7 @@ quickedit = {
             widget = reaper.ImGui_SliderDouble,
             min = 1,
             max = 400,
-            value = 25,
+            value = 6.25,
             type = 'sliderdouble',
             desc = 'The window time for averaging.'
         },
@@ -134,7 +136,7 @@ quickedit = {
             widget = reaper.ImGui_SliderDouble,
             min = 1,
             max = 400,
-            value = 50,
+            value = 12.5,
             type = 'sliderdouble',
             desc = 'The window time for peak finding.'
         },
@@ -168,7 +170,7 @@ quickedit = {
             widget = reaper.ImGui_SliderDouble,
             min = 1,
             max = 1000,
-            value = 30,
+            value = 40,
             type = 'sliderdouble',
             desc = 'The window time for searching.'
         },
@@ -177,7 +179,7 @@ quickedit = {
             widget = reaper.ImGui_SliderDouble,
             min = 1,
             max = 1000,
-            value = 30,
+            value = 140,
             type = 'sliderdouble',
             desc = 'The window time for holding.'
         },
@@ -186,27 +188,36 @@ quickedit = {
             widget = reaper.ImGui_SliderDouble,
             min = 0,
             max = 50,
-            value = 10,
+            value = 20,
             type = 'sliderdouble',
             desc = 'The threshold in dB relative to the minimum average.'
         },
         {
-            name = 'ratio',
+            name = 'percentage',
             widget = reaper.ImGui_SliderDouble,
             min = 0,
-            max = 1,
-            value = 0.35,
+            max = 100,
+            value = 50,
             type = 'sliderdouble',
-            desc = 'The ratio of samples that would need to be above the threshold.'
+            desc = 'The percentage of samples that would need to be above the threshold.'
         },
         {
             name = 'min_length',
             widget = reaper.ImGui_SliderDouble,
             min = 0,
             max = 2000,
-            value = 5,
+            value = 300,
             type = 'sliderdouble',
             desc = 'The minimum detection length.'
+        },
+        {
+            name = 'min_level',
+            widget = reaper.ImGui_SliderDouble,
+            min = 0,
+            max = 100,
+            value = 30,
+            type = 'sliderdouble',
+            desc = 'The minimum detection level for a segment.'
         },
     },
     perform_update = segment
