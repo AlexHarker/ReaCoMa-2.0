@@ -32,6 +32,7 @@ imgui_helpers.draw_gui = function(ctx, obj)
     local change = 0
     local active = 0
     for parameter, d in pairs(obj.parameters) do
+        local old_value = d.value
         if d.type == 'sliderint' then
             _, d.value = d.widget(
                 ctx,
@@ -58,10 +59,7 @@ imgui_helpers.draw_gui = function(ctx, obj)
         local help_text = d.desc or 'no help available'
         imgui_helpers.HelpMarker(ctx, help_text)
         active = active + reacoma.utils.bool_to_number[widget_active]
-        -- TODO:
-        -- If something is active (edited currently)...
-        -- ... we don't want to trigger a change
-        change = change + reacoma.utils.bool_to_number[temp]
+        change = change + reacoma.utils.bool_to_number[d.value ~= old_value]
     end
     reacoma.global_state.active = active
     return change
