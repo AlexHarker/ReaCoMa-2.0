@@ -21,27 +21,35 @@ imgui_helpers.HelpMarker = function(ctx, desc)
     end
   end
 
+imgui_helpers.slider_flags = function(d)
+    if d.flag then
+        return d.flag | reaper.ImGui_SliderFlags_AlwaysClamp()
+    end
+    return reaper.ImGui_SliderFlags_AlwaysClamp()
+end
+
 imgui_helpers.draw_gui = function(ctx, obj)
     local change = 0
     local active = 0
     for parameter, d in pairs(obj.parameters) do
         if d.type == 'sliderint' then
-            temp, d.value = d.widget(
-                ctx, 
-                d.name, d.value, d.min, d.max
+            _, d.value = d.widget(
+                ctx,
+                d.name, d.value, d.min, d.max, '%d',
+                imgui_helpers.slider_flags(d)
             )
         end
         if d.type == 'sliderdouble' then
-            temp, d.value = d.widget(
+            _, d.value = d.widget(
                 ctx,
                 d.name, d.value, d.min, d.max,
                 '%.3f',
-                d.flag or 0
+                imgui_helpers.slider_flags(d)
             )
         end
         if d.type == 'combo' then
-            temp, d.value = d.widget(
-                ctx, 
+            _, d.value = d.widget(
+                ctx,
                 d.name, d.value, d.items
             )
         end
