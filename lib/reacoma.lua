@@ -97,6 +97,7 @@ else
     reacoma.transientslice = require("algorithms/transientslice")
     reacoma.onsetslice = require("algorithms/onsetslice")
     reacoma.ampgate = require("algorithms/ampgate")
+    reacoma.quickedit = require("algorithms/quickedit")
     -- Layers
     reacoma.hpss = require("algorithms/hpss")
     reacoma.nmf = require("algorithms/nmf")
