@@ -102,7 +102,7 @@ imgui_wrapper.loop = function(ctx, viewport, state, obj)
             state = reacoma.imgui_helpers.process(obj) -- TODO: make this respond to slicer/layers
         end
 
-        if obj.info.action == 'segment' then
+        if obj.info.action == 'segment' or obj.info.action == 'slice' then
             reaper.ImGui_SameLine(ctx)
             _, reacoma.settings.slice_preview = reaper.ImGui_Checkbox(ctx,
                 'preview',

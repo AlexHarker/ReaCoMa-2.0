@@ -66,7 +66,7 @@ imgui_helpers.draw_gui = function(ctx, obj)
 end
 
 imgui_helpers.do_preview = function(ctx, obj, change)
-    if obj.info.action ~= 'segment' or not reacoma.settings.slice_preview then
+    if (obj.info.action ~= 'segment' and obj.info.action ~= 'slice') or not reacoma.settings.slice_preview then
       return false
     end
     local left = reaper.ImGui_MouseButton_Left()
@@ -127,6 +127,39 @@ imgui_helpers.process = function(obj)
         end
         reaper.UpdateArrange()
         reaper.Undo_EndBlock("Segmentation with " .. obj.info.ext_name, 0)
+        
+    elseif obj.info.action == 'slice' then
+        
+        reaper.Undo_BeginBlock()
+        
+        local num_selected_items = reaper.CountSelectedMediaItems(0)
+        for i=1, num_selected_items do
+            item = reaper.GetSelectedMediaItem(0, i-1)
+            take = reaper.GetActiveTake(item)
+            offset = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
+            num_markers = reaper.GetNumTakeMarkers(take)
+            num_regions =  num_markers // 2
+            
+            -- Collect the take regions
+            take_regions = {}
+            for j=1, num_regions do
+                region = {}
+                region[1] = reaper.GetTakeMarker(take, j * 2 - 2) + offset
+                region[2] = reaper.GetTakeMarker(take, j * 2 - 1) + offset
+                table.insert(take_regions, region)
+            end
+            
+            -- Now remove take markers from the item
+            for j=1, num_markers do
+                reaper.DeleteTakeMarker(take, num_markers-j)
+            end
+
+            for j=1, #take_regions do
+                reaper.AddProjectMarker(0, true, take_regions[j][1], take_regions[j][2], "", 0)
+            end
+        end
+        reaper.UpdateArrange()
+        reaper.Undo_EndBlock("Segmentation with " .. obj.info.ext_name, 4)
     else
         reaper.Undo_EndBlock("Process with " .. obj.info.ext_name, 4)
     end
