@@ -55,8 +55,6 @@ function segment(parameters)
 
         local type_string = types[type + 1]
 
-        utils.DEBUG(type_string)
-
         local file = reacoma.utils.wrap_quotes(data.full_path[i])
         local cached = paths.expandtilde(temp_folder .. utils.name(data.full_path[i]))
         local needs_full_calc = recalc or not paths.file_exists(cached)
