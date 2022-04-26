@@ -4,10 +4,13 @@ loadfile(script_path .. "lib/reacoma.lua")()
 if reacoma.settings.fatal then return end
 
 obj = reacoma.quickedit
+params.store_defaults(obj)
+
 reacoma.params.get(obj)
 
 reacoma.global_state.width = 456
 reacoma.global_state.height = 263
+
 
 ctx, viewport = imgui_helpers.create_context(obj.info.algorithm_name)
 

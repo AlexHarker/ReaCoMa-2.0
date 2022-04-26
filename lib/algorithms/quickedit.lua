@@ -36,6 +36,7 @@ function segment(parameters)
     local hold_ms = parameters[7].value
     local threshold = parameters[8].value
     local ratio = parameters[9].value
+    local min_length = parameters[10].value
 
     local recalc = cache_basic_test(parameters)
 
@@ -75,7 +76,8 @@ function segment(parameters)
         " --hold_ms " .. hold_ms ..
         " --threshold " .. threshold ..
         " --ratio " .. ratio ..
-        " --cache " .. cached
+        " --cache " .. cached ..
+        " --min_length " .. min_length
 
         local retval = reaper.ExecProcess(cmd, 0)
 
@@ -122,8 +124,8 @@ quickedit = {
             name = 'avg_ms',
             widget = reaper.ImGui_SliderDouble,
             min = 1,
-            max = 1000,
-            value = 30,
+            max = 400,
+            value = 25,
             type = 'sliderdouble',
             desc = 'The window time for averaging.'
         },
@@ -131,15 +133,15 @@ quickedit = {
             name = 'peak_ms',
             widget = reaper.ImGui_SliderDouble,
             min = 1,
-            max = 1000,
-            value = 30,
+            max = 400,
+            value = 50,
             type = 'sliderdouble',
             desc = 'The window time for peak finding.'
         },
         {
             name = 'type',
             widget = reaper.ImGui_Combo,
-            value = 0,
+            value = 1,
             items = 'rms\31rms_hann\31mean\31mean_hann\31',
             type = 'combo',
             desc = 'The average type.'
@@ -157,7 +159,7 @@ quickedit = {
             widget = reaper.ImGui_SliderInt,
             min = 1,
             max = 25,
-            value = 1,
+            value = 4,
             type = 'sliderint',
             desc = 'The integer value to reduce by.'
         },
@@ -196,6 +198,15 @@ quickedit = {
             value = 0.35,
             type = 'sliderdouble',
             desc = 'The ratio of samples that would need to be above the threshold.'
+        },
+        {
+            name = 'min_length',
+            widget = reaper.ImGui_SliderDouble,
+            min = 0,
+            max = 2000,
+            value = 5,
+            type = 'sliderdouble',
+            desc = 'The minimum detection length.'
         },
     },
     perform_update = segment
