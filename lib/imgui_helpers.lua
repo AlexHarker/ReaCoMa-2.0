@@ -86,6 +86,8 @@ end
 imgui_helpers.process = function(obj)
     -- This is called everytime there is a process button pressed
     -- This button is uniform across layers/slices and is found at the top left
+    reaper.Undo_BeginBlock()
+
     local state = obj.perform_update(obj.parameters)
 
     if obj.info.action == 'segment' then
@@ -124,6 +126,9 @@ imgui_helpers.process = function(obj)
             end
         end
         reaper.UpdateArrange()
+        reaper.Undo_EndBlock("Segmentation with " .. obj.info.ext_name, 0)
+    else
+        reaper.Undo_EndBlock("Process with " .. obj.info.ext_name, 4)
     end
 
     return state
