@@ -117,7 +117,7 @@ quickedit = {
     info = {
         algorithm_name = 'Quick Edit',
         ext_name = 'reacoma.quickedit',
-        action = 'segment'
+        action = 'slice'
     },
     parameters =  {
         {
