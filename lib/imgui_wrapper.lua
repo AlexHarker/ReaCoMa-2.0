@@ -128,6 +128,15 @@ imgui_wrapper.loop = function(ctx, viewport, state, obj)
                 state = params.restore_defaults(obj)
                 restored = true
             end
+            reaper.ImGui_SameLine(ctx)
+            if reaper.ImGui_Button(ctx, "save") then
+                state = params.save_preset(obj)
+            end
+            reaper.ImGui_SameLine(ctx)
+            if reaper.ImGui_Button(ctx, "restore") then
+                state = params.restore_preset(obj)
+                restored = true
+            end
         end
         state = reacoma.imgui_helpers.update_state(ctx, obj, restored)
         reaper.ImGui_End(ctx)

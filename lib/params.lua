@@ -1,4 +1,6 @@
+
 params = {}
+exts = "Reacoma preset files (.rcmprst)\0*.rcmprst\0\0"
 
 params.set = function(obj)
     for parameter, d in pairs(obj.parameters) do
@@ -14,23 +16,59 @@ params.get = function(obj)
     end
 end
 
-params.store_defaults = function(obj)
+params.store = function(obj)
     idx = 1
-    defaults = {}
+    local values = {}
     for parameter, d in pairs(obj.parameters) do
-        defaults[idx] = d.value
+        values[idx] = d.value
         idx = idx + 1
     end
-    obj.defaults = defaults
+    return values
+end
+
+params.restore = function(obj, values)
+    idx = 1
+    for parameter, d in pairs(obj.parameters) do
+        d.value = values[idx]
+        idx = idx + 1
+    end
+end
+
+params.store_defaults = function(obj)
+    obj.defaults = params.store(obj)
 end
 
 params.restore_defaults = function(obj)
-    idx = 1
-    for parameter, d in pairs(obj.parameters) do
-        d.value = obj.defaults[idx]
-        idx = idx + 1
+    params.restore(obj, obj.defaults)
+end
+
+params.save_preset = function(obj)
+    path = reacoma.settings.last_preset_path
+    preset = params.store(obj)
+    retval, path = reaper.JS_Dialog_BrowseForSaveFile("Save Preset", path, "", exts)
+    file = io.open(path,'w')
+    if file then
+        for i=1, #preset do
+            file:write(tostring(preset[i]) .. "\n")
+        end
+        file:close()
+        reacoma.settings.last_preset_path = utils.dir_parent(path)
     end
 end
 
+params.restore_preset = function(obj)
+    path = reacoma.settings.last_preset_path
+    retval, path = reaper.JS_Dialog_BrowseForOpenFiles("Read Preset", path, "", exts, false)
+    file = io.open(path,'r')
+    if file then
+        file:close()
+        preset = {}
+        for line in io.lines(path) do 
+            preset[#preset + 1] = tonumber(line)
+        end
+        params.restore(obj, preset)
+        reacoma.settings.last_preset_path = utils.dir_parent(path)
+    end
+end
 
 return params
