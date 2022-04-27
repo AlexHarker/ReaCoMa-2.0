@@ -27,6 +27,7 @@ if not reaper.HasExtState("reacoma", "exepath") then
 end
 
 reacoma.settings.path = reaper.GetExtState("reacoma", "exepath")
+reacoma.settings.last_preset_path = ""
 
 if reaper.HasExtState("reacoma", "slice_preview") then
     local preview = reaper.GetExtState("reacoma", "slice_preview")
