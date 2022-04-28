@@ -1,6 +1,6 @@
 
 params = {}
-exts = "Reacoma preset files (.rcmprst)\0*.rcmprst\0\0"
+reacoma_preset_exts = "Reacoma preset files (.rcmprst)\0*.rcmprst\0\0"
 
 params.set = function(obj)
     for parameter, d in pairs(obj.parameters) do
@@ -17,7 +17,7 @@ params.get = function(obj)
 end
 
 params.store = function(obj)
-    idx = 1
+    local idx = 1
     local values = {}
     for parameter, d in pairs(obj.parameters) do
         values[idx] = d.value
@@ -27,7 +27,7 @@ params.store = function(obj)
 end
 
 params.restore = function(obj, values)
-    idx = 1
+    local idx = 1
     for parameter, d in pairs(obj.parameters) do
         d.value = values[idx]
         idx = idx + 1
@@ -43,10 +43,10 @@ params.restore_defaults = function(obj)
 end
 
 params.save_preset = function(obj)
-    path = reacoma.settings.last_preset_path
-    preset = params.store(obj)
-    retval, path = reaper.JS_Dialog_BrowseForSaveFile("Save Preset", path, "", exts)
-    file = io.open(path,'w')
+    local path = reacoma.settings.last_preset_path
+    local preset = params.store(obj)
+    local retval, path = reaper.JS_Dialog_BrowseForSaveFile("Save Preset", path, "", reacoma_preset_exts)
+    local file = io.open(path,'w')
     if file then
         for i=1, #preset do
             file:write(tostring(preset[i]) .. "\n")
@@ -57,13 +57,13 @@ params.save_preset = function(obj)
 end
 
 params.restore_preset = function(obj)
-    path = reacoma.settings.last_preset_path
-    retval, path = reaper.JS_Dialog_BrowseForOpenFiles("Read Preset", path, "", exts, false)
-    file = io.open(path,'r')
+    local path = reacoma.settings.last_preset_path
+    local retval, path = reaper.JS_Dialog_BrowseForOpenFiles("Read Preset", path, "", reacoma_preset_exts, false)
+    local file = io.open(path,'r')
     if file then
         file:close()
-        preset = {}
-        for line in io.lines(path) do 
+        local preset = {}
+        for line in io.lines(path) do
             preset[#preset + 1] = tonumber(line)
         end
         params.restore(obj, preset)
