@@ -215,7 +215,7 @@ quickedit = {
             widget = reaper.ImGui_SliderDouble,
             min = 0,
             max = 100,
-            value = 30,
+            value = 20,
             type = 'sliderdouble',
             desc = 'The minimum detection level for a segment.'
         },
