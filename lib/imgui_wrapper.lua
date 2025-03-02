@@ -102,7 +102,7 @@ imgui_wrapper.loop = function(ctx, viewport, state, obj)
             state = reacoma.imgui_helpers.process(obj) -- TODO: make this respond to slicer/layers
         end
 
-        if obj.info.action == 'segment' then
+        if obj.info.action == 'segment' or obj.info.action == 'slice' then
             reaper.ImGui_SameLine(ctx)
             _, reacoma.settings.slice_preview = reaper.ImGui_Checkbox(ctx,
                 'preview',
@@ -128,6 +128,15 @@ imgui_wrapper.loop = function(ctx, viewport, state, obj)
                 state = params.restore_defaults(obj)
                 restored = true
             end
+            reaper.ImGui_SameLine(ctx)
+            if reaper.ImGui_Button(ctx, "save") then
+                state = params.save_preset(obj)
+            end
+            reaper.ImGui_SameLine(ctx)
+            if reaper.ImGui_Button(ctx, "restore") then
+                state = params.restore_preset(obj)
+                restored = true
+            end
         end
         state = reacoma.imgui_helpers.update_state(ctx, obj, restored)
         reaper.ImGui_End(ctx)
@@ -140,7 +149,6 @@ imgui_wrapper.loop = function(ctx, viewport, state, obj)
         )
     else
         reaper.ImGui_DestroyContext(ctx)
-        reaper.Undo_EndBlock2(0, obj.info.ext_name, 4)
         reacoma.params.set(obj)
         reaper.SetExtState('reacoma', 'slice_preview', utils.bool_to_string[reacoma.settings.slice_preview], true)
         reaper.SetExtState('reacoma', 'immediate_preview', utils.bool_to_string[reacoma.settings.immediate_preview], true)

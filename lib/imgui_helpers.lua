@@ -21,27 +21,36 @@ imgui_helpers.HelpMarker = function(ctx, desc)
     end
   end
 
+imgui_helpers.slider_flags = function(d)
+    if d.flag then
+        return d.flag | reaper.ImGui_SliderFlags_AlwaysClamp()
+    end
+    return reaper.ImGui_SliderFlags_AlwaysClamp()
+end
+
 imgui_helpers.draw_gui = function(ctx, obj)
     local change = 0
     local active = 0
     for parameter, d in pairs(obj.parameters) do
+        local old_value = d.value
         if d.type == 'sliderint' then
-            temp, d.value = d.widget(
-                ctx, 
-                d.name, d.value, d.min, d.max
+            _, d.value = d.widget(
+                ctx,
+                d.name, d.value, d.min, d.max, '%d',
+                imgui_helpers.slider_flags(d)
             )
         end
         if d.type == 'sliderdouble' then
-            temp, d.value = d.widget(
+            _, d.value = d.widget(
                 ctx,
                 d.name, d.value, d.min, d.max,
                 '%.3f',
-                d.flag or 0
+                imgui_helpers.slider_flags(d)
             )
         end
         if d.type == 'combo' then
-            temp, d.value = d.widget(
-                ctx, 
+            _, d.value = d.widget(
+                ctx,
                 d.name, d.value, d.items
             )
         end
@@ -50,21 +59,18 @@ imgui_helpers.draw_gui = function(ctx, obj)
         local help_text = d.desc or 'no help available'
         imgui_helpers.HelpMarker(ctx, help_text)
         active = active + reacoma.utils.bool_to_number[widget_active]
-        -- TODO:
-        -- If something is active (edited currently)...
-        -- ... we don't want to trigger a change
-        change = change + reacoma.utils.bool_to_number[temp]
+        change = change + reacoma.utils.bool_to_number[d.value ~= old_value]
     end
     reacoma.global_state.active = active
     return change
 end
 
 imgui_helpers.do_preview = function(ctx, obj, change)
-    if obj.info.action ~= 'segment' or not reacoma.settings.slice_preview then
+    if (obj.info.action ~= 'segment' and obj.info.action ~= 'slice') or not reacoma.settings.slice_preview then
       return false
     end
     local left = reaper.ImGui_MouseButton_Left()
-    local drag_preview = change > 0 and reacoma.settings.drag_preview
+    local drag_preview = change > 0 and reacoma.settings.immediate_preview
     local end_drag_preview = not reacoma.settings.immediate_preview and not reaper.ImGui_IsMouseDown(ctx, left) and reacoma.settings.preview_pending
     reacoma.settings.preview_pending = not end_drag_preview and (reacoma.settings.preview_pending or (change > 0 and not reacoma.settings.immediate_preview))
     return drag_preview or end_drag_preview
@@ -80,6 +86,8 @@ end
 imgui_helpers.process = function(obj)
     -- This is called everytime there is a process button pressed
     -- This button is uniform across layers/slices and is found at the top left
+    reaper.Undo_BeginBlock()
+
     local state = obj.perform_update(obj.parameters)
 
     if obj.info.action == 'segment' then
@@ -118,6 +126,42 @@ imgui_helpers.process = function(obj)
             end
         end
         reaper.UpdateArrange()
+        reaper.Undo_EndBlock("Segmentation with " .. obj.info.ext_name, 0)
+        
+    elseif obj.info.action == 'slice' then
+        
+        reaper.Undo_BeginBlock()
+        
+        local num_selected_items = reaper.CountSelectedMediaItems(0)
+        for i=1, num_selected_items do
+            item = reaper.GetSelectedMediaItem(0, i-1)
+            take = reaper.GetActiveTake(item)
+            offset = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
+            num_markers = reaper.GetNumTakeMarkers(take)
+            num_regions =  num_markers // 2
+            
+            -- Collect the take regions
+            take_regions = {}
+            for j=1, num_regions do
+                region = {}
+                region[1] = reaper.GetTakeMarker(take, j * 2 - 2) + offset
+                region[2] = reaper.GetTakeMarker(take, j * 2 - 1) + offset
+                table.insert(take_regions, region)
+            end
+            
+            -- Now remove take markers from the item
+            for j=1, num_markers do
+                reaper.DeleteTakeMarker(take, num_markers-j)
+            end
+
+            for j=1, #take_regions do
+                reaper.AddProjectMarker(0, true, take_regions[j][1], take_regions[j][2], "", 0)
+            end
+        end
+        reaper.UpdateArrange()
+        reaper.Undo_EndBlock("Segmentation with " .. obj.info.ext_name, 4)
+    else
+        reaper.Undo_EndBlock("Process with " .. obj.info.ext_name, 4)
     end
 
     return state
