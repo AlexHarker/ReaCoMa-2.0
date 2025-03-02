@@ -88,6 +88,25 @@ wrapper.loop = function(args)
         end
     end
 
+    -- Parameter defaults, and save/restore to disk
+    if r.ImGui_CollapsingHeader(ctx, 'Parameters', nil, r.ImGui_TreeNodeFlags_None()) then
+        if obj.defaults ~= nil then
+            if reaper.ImGui_Button(ctx, "defaults") then
+                state = reacoma.params.restore_defaults(obj)
+                restored = true
+            end
+            reaper.ImGui_SameLine(ctx)
+        end
+        if reaper.ImGui_Button(ctx, "save") then
+            state = reacoma.params.save_to_file(obj)
+        end
+        reaper.ImGui_SameLine(ctx)
+        if reaper.ImGui_Button(ctx, "restore") then
+            state = reacoma.params.restore_from_file(obj)
+            restored = true
+        end
+    end
+
     -- TODO: Preset System
     -- if r.ImGui_CollapsingHeader(ctx, 'Presets', nil, r.ImGui_TreeNodeFlags_None()) then
         -- for i = 1, #presets do
