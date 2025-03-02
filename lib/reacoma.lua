@@ -12,6 +12,8 @@ reacoma.debug = { cli = '' }
 reacoma.settings = { version = 210 } -- this needs to be changed on major version releases
 reacoma.global_state = { active = false }
 
+-- Set an empty path to presets by default
+reacoma.global_state.last_preset_path = ""
 
 -- Add modules to reacoma table
 reacoma.container = require("container")
