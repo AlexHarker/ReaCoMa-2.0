@@ -22,7 +22,7 @@ end
 
 function segment(parameters)
 
-    local temp_folder =reacoma.utils.dir_parent(os.tmpname())
+    local temp_folder = reacoma.utils.dir_parent(os.tmpname())
 
     local exe = reacoma.utils.wrap_quotes(
         reacoma.utils.cross_platform_executable(
@@ -45,15 +45,16 @@ function segment(parameters)
 
     local recalc = cache_basic_test(parameters)
 
-    local data = reacoma.utils.deep_copy(reacoma.container.generic)
+    local processed_items = {}
+
     for i=1, num_selected_items do
-        reacoma.container.get_data(i, data)
+        local data = reacoma.container.get_item_info(i)
 
         -- Remove any existing take markers
-        for j=1, data.take_markers[i] do
+        for j=1, data.take_markers do
             reaper.DeleteTakeMarker(
-                data.take[i],
-                data.take_markers[i] - j
+                data.take,
+                data.take_markers - j
             )
         end
 
@@ -61,8 +62,8 @@ function segment(parameters)
 
         local type_string = types[type + 1]
 
-        local file = reacoma.utils.wrap_quotes(data.full_path[i])
-        local cached = paths.expandtilde(temp_folder .. reacoma.utils.name(data.full_path[i]))
+        local file = reacoma.utils.wrap_quotes(data.full_path)
+        local cached = paths.expandtilde(temp_folder .. reacoma.utils.name(data.full_path))
         local needs_full_calc = recalc or not paths.file_exists(cached)
 
         if not needs_full_calc then
@@ -94,29 +95,32 @@ function segment(parameters)
         --reacoma.slicing.process(i, data, true)
         for j=1, result_length do
             local slice_pos1 = tonumber(results[j * 2])
-            local slice_secs1 = reacoma.utils.sampstos(slice_pos1, data.sr[i])
+            -- We need to do the same transformation as the slicing algorithm here
+            local slice_secs1 = reacoma.utils.sampstos(slice_pos1, data.sr)
             local slice_pos2 = tonumber(results[j * 2 + 1])
-            local slice_secs2 = reacoma.utils.sampstos(slice_pos2, data.sr[i])
+            local slice_secs2 = reacoma.utils.sampstos(slice_pos2, data.sr)
 
             reaper.SetTakeMarker(
-                data.take[i],
+                data.take,
                 -1, '',
                 slice_secs1,
                 reaper.ColorToNative(255, 0, 0) | 0x1000000
             )
 
             reaper.SetTakeMarker(
-                data.take[i],
+                data.take,
                 -1, '',
                 slice_secs2,
                 reaper.ColorToNative(160, 0, 160) | 0x1000000
             )
         end
+
+        table.insert(processed_items, data)
     end
 
     reaper.UpdateArrange()
-    reacoma.utils.cleanup(data.tmp)
-    return data
+    --reacoma.utils.cleanup(data.tmp)
+    return processed_items
 end
 
 quickedit = {
