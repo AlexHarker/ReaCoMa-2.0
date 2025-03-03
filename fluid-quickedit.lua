@@ -5,7 +5,6 @@ if reacoma.settings.fatal then return end
 
 obj = reacoma.algorithms.quickedit
 reacoma.params.store_defaults(obj)
-
 reacoma.params.get(obj)
 
 reacoma.global_state.width = 456
