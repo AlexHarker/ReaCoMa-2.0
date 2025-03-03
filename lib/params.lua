@@ -2,6 +2,7 @@ local r = reaper
 
 local params = {}
 local exts = "Reacoma preset files (.rcmprst)\0*.rcmprst\0\0"
+local preset_ext = "rcmprst"
 
 -- So we don't have to figure out what the index of a table is
 -- for any given default parameters. We can encapsulate it into
@@ -20,6 +21,17 @@ params.find_by_name = function(param_tbl, query_name)
     for _, param in ipairs(param_tbl) do
         if param.name == query_name then
             return param.value
+        end
+    end
+    r.ShowConsoleMsg(query_name.. ' not found')
+    return nil
+end
+
+params.set_by_name = function(param_tbl, query_name, value)
+    for _, param in ipairs(param_tbl) do
+        if param.name == query_name then
+            param.value = value
+            return nil
         end
     end
     r.ShowConsoleMsg(query_name.. ' not found')
@@ -51,20 +63,16 @@ params.get = function(obj)
 end
 
 params.store = function(obj)
-    idx = 1
     local values = {}
     for parameter, d in pairs(obj.parameters) do
-        values[idx] = d.value
-        idx = idx + 1
+        table.insert(values, { name = d.name, value = d.value })
     end
     return values
 end
 
 params.restore = function(obj, values)
-    idx = 1
-    for parameter, d in pairs(obj.parameters) do
-        d.value = values[idx]
-        idx = idx + 1
+    for parameter, d in pairs(values) do
+        params.set_by_name(obj.parameters, d.name, d.value)
     end
 end
 
@@ -75,7 +83,6 @@ end
 params.restore_defaults = function(obj)
     params.restore(obj, obj.defaults)
 end
-
 
 params.store_preset = function(obj, slot)
     for _, param in pairs(obj.parameters) do
@@ -99,31 +106,43 @@ params.get_preset = function(obj, slot)
 end
 
 params.save_to_file = function(obj)
-    path = reacoma.settings.last_preset_path
+    path = reacoma.global_state.last_preset_path
     preset = params.store(obj)
     retval, path = reaper.JS_Dialog_BrowseForSaveFile("Save Preset", path, "", exts)
     file = io.open(path,'w')
     if file then
+        file:write(obj.info.ext_name .. "\n")
         for i=1, #preset do
-            file:write(tostring(preset[i]) .. "\n")
+            file:write(tostring(preset[i].name) .. "\n")
+            file:write(tostring(preset[i].value) .. "\n")
         end
         file:close()
-        reacoma.settings.last_preset_path = reacoma.utils.dir_parent(path)
+        reacoma.global_state.last_preset_path = reacoma.utils.dir_parent(path)
     end
 end
 
 params.restore_from_file = function(obj)
-    path = reacoma.settings.last_preset_path
-    retval, path = reaper.JS_Dialog_BrowseForOpenFiles("Read Preset", path, "", exts, false)
+    path = reacoma.global_state.last_preset_path
+    retval, path = reaper.GetUserFileNameForRead(path, "Read Preset", preset_ext)
     file = io.open(path,'r')
     if file then
-        file:close()
         preset = {}
-        for line in io.lines(path) do 
-            preset[#preset + 1] = tonumber(line)
+        -- Check if the file is a valid preset file
+        if file:read("*l") ~= obj.info.ext_name then
+            r.ShowConsoleMsg("Preset file does not match this module\n")
+            return
         end
+        -- Read in parameters one by one
+        while file:read(0) ~= nil do
+            local p_name = file:read("*l")
+            local p_value = file:read("*l")
+            if p_name ~= nil and p_value ~= nil then
+                table.insert(preset, { name = p_name, value = p_value })
+            end
+        end
+        file:close()
         params.restore(obj, preset)
-        reacoma.settings.last_preset_path = reacoma.utils.dir_parent(path)
+        reacoma.global_state.last_preset_path = reacoma.utils.dir_parent(path)
     end
 end
 
