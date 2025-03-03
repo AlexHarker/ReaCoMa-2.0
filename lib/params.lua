@@ -2,6 +2,7 @@ local r = reaper
 
 local params = {}
 local exts = "Reacoma preset files (.rcmprst)\0*.rcmprst\0\0"
+local preset_ext = "rcmprst"
 
 -- So we don't have to figure out what the index of a table is
 -- for any given default parameters. We can encapsulate it into
@@ -122,7 +123,7 @@ end
 
 params.restore_from_file = function(obj)
     path = reacoma.global_state.last_preset_path
-    retval, path = reaper.JS_Dialog_BrowseForOpenFiles("Read Preset", path, "", exts, false)
+    retval, path = reaper.GetUserFileNameForRead(path, "Read Preset", preset_ext)
     file = io.open(path,'r')
     if file then
         preset = {}
