@@ -119,7 +119,9 @@ else
         if file_name then
             local basename = file_name:match("(.+)%..+")
             if basename then
-                reacoma.algorithms[basename] = require("algorithms/" .. basename)
+                local algorithm = require("algorithms/" .. basename)
+                reacoma.algorithms[basename] = algorithm 
+                reacoma.params.store_defaults(algorithm)
             end
         end
     until file_name == nil
