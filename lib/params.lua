@@ -105,7 +105,7 @@ params.get_preset = function(obj, slot)
 end
 
 params.save_to_file = function(obj)
-    path = reacoma.settings.last_preset_path
+    path = reacoma.global_state.last_preset_path
     preset = params.store(obj)
     retval, path = reaper.JS_Dialog_BrowseForSaveFile("Save Preset", path, "", exts)
     file = io.open(path,'w')
@@ -116,12 +116,12 @@ params.save_to_file = function(obj)
             file:write(tostring(preset[i].value) .. "\n")
         end
         file:close()
-        reacoma.settings.last_preset_path = reacoma.utils.dir_parent(path)
+        reacoma.global_state.last_preset_path = reacoma.utils.dir_parent(path)
     end
 end
 
 params.restore_from_file = function(obj)
-    path = reacoma.settings.last_preset_path
+    path = reacoma.global_state.last_preset_path
     retval, path = reaper.JS_Dialog_BrowseForOpenFiles("Read Preset", path, "", exts, false)
     file = io.open(path,'r')
     if file then
@@ -141,7 +141,7 @@ params.restore_from_file = function(obj)
         end
         file:close()
         params.restore(obj, preset)
-        reacoma.settings.last_preset_path = reacoma.utils.dir_parent(path)
+        reacoma.global_state.last_preset_path = reacoma.utils.dir_parent(path)
     end
 end
 
