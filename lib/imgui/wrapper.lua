@@ -141,7 +141,6 @@ wrapper.loop = function(args)
         )
     else
         r.ImGui_DestroyContext(args.ctx)
-        r.Undo_EndBlock2(0, args.obj.info.ext_name, 4)
         reacoma.params.set(args.obj)
         r.SetExtState('reacoma', 'slice_preview', reacoma.utils.bool_to_string[reacoma.settings.slice_preview], true)
         r.SetExtState('reacoma', 'immediate_preview', reacoma.utils.bool_to_string[reacoma.settings.immediate_preview], true)
