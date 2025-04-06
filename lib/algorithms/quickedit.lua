@@ -20,6 +20,10 @@ function cache_basic_test(parameters)
 
 end
 
+function time_convert(pos, data)
+    return reacoma.utils.sampstos(pos, data.sr)
+end
+
 function segment(parameters)
 
     local temp_folder = reacoma.utils.dir_parent(os.tmpname())
@@ -91,14 +95,11 @@ function segment(parameters)
         local results = split_results(retval, " ")
         local result_length = (#results - 1) // 2
 
-        --table.insert(data.slice_points_string, reacoma.utils.readfile(data.tmp[i]))
-        --reacoma.slicing.process(i, data, true)
+        --We don't use slicing here because there is some santiisation that we don't want to do 
         for j=1, result_length do
-            local slice_pos1 = tonumber(results[j * 2])
-            -- We need to do the same transformation as the slicing algorithm here
-            local slice_secs1 = reacoma.utils.sampstos(slice_pos1, data.sr)
-            local slice_pos2 = tonumber(results[j * 2 + 1])
-            local slice_secs2 = reacoma.utils.sampstos(slice_pos2, data.sr)
+            -- We currenly don't deal with the reversal of the source at all
+            local slice_secs1 = time_convert(tonumber(results[j * 2 + 0]), data)
+            local slice_secs2 = time_convert(tonumber(results[j * 2 + 1]), data)
 
             reaper.SetTakeMarker(
                 data.take,
