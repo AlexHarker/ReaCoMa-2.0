@@ -33,20 +33,8 @@ slicing.convert_to_source_time = function(slice_points, data)
     return slice_points
 end
 
-slicing.gateslice = function(data)
-    local onsets_and_offsets = reacoma.utils.split_space(data.slice_points_string)
-
-    -- Interleave the onsets/offsets
-    local slice_points = reacoma.utils.lace_tables(
-        reacoma.utils.split_comma(onsets_and_offsets[1]),
-        reacoma.utils.split_comma(onsets_and_offsets[2])
-    )
-
-    -- Also test if the slice points are logical, otherwise exit
-    if gate_based_slicer and (slice_points[1] == '-1' or slice_points[2] == '-1') then 
-        return 
-    end
-
+slicing.do_onsets_and_offsets = function(slice_points, data)
+    
     slice_points = slicing.convert_to_source_time(slice_points, data)
 
     local color_on = reacoma.colors.scheme[1] or { r=255, g=0, b=0 }
@@ -69,6 +57,23 @@ slicing.gateslice = function(data)
             color
         )
     end
+end
+
+slicing.gateslice = function(data)
+    local onsets_and_offsets = reacoma.utils.split_space(data.slice_points_string)
+
+    -- Interleave the onsets/offsets
+    local slice_points = reacoma.utils.lace_tables(
+        reacoma.utils.split_comma(onsets_and_offsets[1]),
+        reacoma.utils.split_comma(onsets_and_offsets[2])
+    )
+
+    -- Also test if the slice points are logical, otherwise exit
+    if gate_based_slicer and (slice_points[1] == '-1' or slice_points[2] == '-1') then 
+        return 
+    end
+
+    slicing.do_onsets_and_offsets(slice_points, data)
 end
 
 slicing.process = function(data)
