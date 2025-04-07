@@ -84,6 +84,10 @@ helpers.update_state = function(ctx, obj, update)
     end
 end
 
+helpers.convert_from_source_time = function(position, item)
+    return ((position - item.take_ofs) / item.playrate) + item.item_pos
+end
+
 helpers.process = function(obj, mode, optional_item_bundle)
     -- This is called everytime there is a process button pressed
     -- This button is uniform across layers/slices and is found at the top left
@@ -107,7 +111,7 @@ helpers.process = function(obj, mode, optional_item_bundle)
             -- Collect the take markers
             local take_markers = {}
             for j=1, num_markers do
-                local marker = r.GetTakeMarker(take, j-1)
+                local marker = helpers.convert_from_source_time(r.GetTakeMarker(take, j-1), processed_items[i])
                 table.insert(take_markers, marker)
             end
             
@@ -118,13 +122,12 @@ helpers.process = function(obj, mode, optional_item_bundle)
 
             for j=1, #take_markers do
                 local slice_pos = take_markers[j]
-                local real_position = slice_pos + processed_items[i].item_pos -- adjust for offset of item
                 if mode == 'split' then
-                    item = r.SplitMediaItem(item, real_position)
+                    item = r.SplitMediaItem(item, slice_pos)
                 elseif mode == 'marker' then
                     local scheme = reacoma.colors.scheme[i] or { r=255, g=0, b=0 }
                     local color = r.ColorToNative( scheme.r, scheme.g, scheme.b ) | 0x1000000
-                    r.AddProjectMarker2(0, false, real_position, real_position, '', -1, color)
+                    r.AddProjectMarker2(0, false, slice_pos, slice_pos, '', -1, color)
                 end
             end
         end
