@@ -110,9 +110,12 @@ helpers.process = function(obj, mode, optional_item_bundle)
             
             -- Collect the take markers
             local take_markers = {}
+            local take_marker_colors = {}
             for j=1, num_markers do
-                local marker = helpers.convert_from_source_time(r.GetTakeMarker(take, j-1), processed_items[i])
-                table.insert(take_markers, marker)
+                local position, name, color = r.GetTakeMarker(take, j-1) 
+                position = helpers.convert_from_source_time(position, processed_items[i])
+                table.insert(take_markers, position)
+                table.insert(take_marker_colors, color)
             end
             
             -- Now remove them from the item
@@ -120,14 +123,21 @@ helpers.process = function(obj, mode, optional_item_bundle)
                 r.DeleteTakeMarker(take, num_markers-j)
             end
 
-            for j=1, #take_markers do
-                local slice_pos = take_markers[j]
-                if mode == 'split' then
-                    item = r.SplitMediaItem(item, slice_pos)
-                elseif mode == 'marker' then
-                    local scheme = reacoma.colors.scheme[i] or { r=255, g=0, b=0 }
-                    local color = r.ColorToNative( scheme.r, scheme.g, scheme.b ) | 0x1000000
+            if mode == 'split' then
+                for j=1, #take_markers do
+                    item = r.SplitMediaItem(item, take_markers[j])
+                end
+            elseif mode == 'marker' then
+                for j=1, #take_markers do
+                    local slice_pos = take_markers[j]
+                    local color = take_marker_colors[j] 
                     r.AddProjectMarker2(0, false, slice_pos, slice_pos, '', -1, color)
+                end 
+            elseif mode == 'region' then
+                for j=1, (#take_markers / 2) do
+                    local idx = (j - 1) * 2 + 1 
+                    local color = take_marker_colors[idx] 
+                    r.AddProjectMarker2(0, true, take_markers[idx], take_markers[idx + 1], '', -1, color)
                 end
             end
         end
