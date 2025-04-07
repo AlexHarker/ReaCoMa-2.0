@@ -49,11 +49,19 @@ slicing.gateslice = function(data)
 
     slice_points = slicing.convert_to_source_time(slice_points, data)
 
+    local color_on = reacoma.colors.scheme[1] or { r=255, g=0, b=0 }
+    local color_off = reacoma.colors.scheme[19] or { r=160, g=0, b=160 }
+
     for i=1, #slice_points do
         local slice_pos = slice_points[i]
+        
+        local scheme = color_off
 
-        local scheme = reacoma.colors.scheme[1] or { r=255, g=0, b=0 }
-        local color = reaper.ColorToNative( scheme.r, scheme.g, scheme.b ) | 0x1000000
+        if (i % 2 == 1) then 
+            scheme = color_on 
+        end
+
+        local color = reaper.ColorToNative(scheme.r, scheme.g, scheme.b) | 0x1000000
         reaper.SetTakeMarker(
             data.take, 
             -1, '', 
