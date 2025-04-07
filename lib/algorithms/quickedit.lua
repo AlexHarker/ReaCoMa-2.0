@@ -20,10 +20,6 @@ function cache_basic_test(parameters)
 
 end
 
-function time_convert(pos, data)
-    return reacoma.utils.sampstos(pos, data.sr)
-end
-
 function segment(parameters)
 
     local temp_folder = reacoma.utils.dir_parent(os.tmpname())
@@ -91,36 +87,23 @@ function segment(parameters)
         " --min_level " .. min_level
 
         local retval = reaper.ExecProcess(cmd, 0)
+        local retcleaned = string.gsub(retval, "^.*results ", "")
+        retcleaned = string.gsub(retcleaned, " \n$", "")
+        results = split_results(retcleaned, " ")
 
-        local results = split_results(retval, " ")
-        local result_length = (#results - 1) // 2
-
-        --We don't use slicing here because there is some santiisation that we don't want to do 
-        for j=1, result_length do
-            -- We currenly don't deal with the reversal of the source at all
-            local slice_secs1 = time_convert(tonumber(results[j * 2 + 0]), data)
-            local slice_secs2 = time_convert(tonumber(results[j * 2 + 1]), data)
-
-            reaper.SetTakeMarker(
-                data.take,
-                -1, '',
-                slice_secs1,
-                reaper.ColorToNative(255, 0, 0) | 0x1000000
-            )
-
-            reaper.SetTakeMarker(
-                data.take,
-                -1, '',
-                slice_secs2,
-                reaper.ColorToNative(160, 0, 160) | 0x1000000
-            )
-        end
+    local output_file = io.open("Users/alexharker/Downloads/results.txt", "w")
+    output_file:write(retcleaned .. "\n")
+    for index, result in ipairs(results) do
+        output_file:write(index .. ": " .. result .. "\n")
+    end
+    output_file:close()
+    
+        slicing.do_onsets_and_offsets(results, data)
 
         table.insert(processed_items, data)
     end
 
     reaper.UpdateArrange()
-    --reacoma.utils.cleanup(data.tmp)
     return processed_items
 end
 
