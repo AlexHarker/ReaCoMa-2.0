@@ -1,5 +1,5 @@
 function split_results(s, delimiter)
-    result = {};
+    result = {}
     for match in (s..delimiter):gmatch("(.-)"..delimiter) do
         table.insert(result, match);
     end
@@ -19,6 +19,27 @@ function cache_basic_test(parameters)
     return calc
 
 end
+
+function in_bounds(value, data)
+    v = tonumber(value)
+    return v >= data.take_ofs_samples and v <= (data.take_ofs_samples + data.item_len_samples)
+end
+
+function constrain_to_item(input, data) 
+    results = {}
+    
+    for i=1, #input / 2 do
+        idx = ((i - 1) * 2) + 1
+        
+        if in_bounds(input[idx], data) and in_bounds(input[idx + 1], data) then
+            table.insert(results, input[idx])
+            table.insert(results, input[idx + 1])
+        end
+    end
+
+    return results
+end
+
 
 function segment(parameters)
 
@@ -90,7 +111,7 @@ function segment(parameters)
         local retcleaned = string.gsub(retval, "^.*results ", "")
         retcleaned = string.gsub(retcleaned, " \n$", "")
         results = split_results(retcleaned, " ")
-    
+        results = constrain_to_item(results, data) 
         slicing.do_onsets_and_offsets(results, data)
 
         table.insert(processed_items, data)
@@ -104,7 +125,7 @@ quickedit = {
     info = {
         algorithm_name = 'Quick Edit',
         ext_name = 'reacoma.quickedit',
-        action = 'segment'
+        action = 'segment',
         offsets = true
     },
     parameters =  {
