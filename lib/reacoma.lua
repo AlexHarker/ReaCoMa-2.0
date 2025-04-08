@@ -135,7 +135,7 @@ if r.HasExtState("reacoma", "slice_preview") then
     if immediate == 'false' then immediate = false else immediate = true end
     reacoma.settings.slice_preview = preview
     reacoma.settings.immediate_preview = immediate
-    reacoma.global_state.preview_pending = false
+    reacoma.global_state.preview_pending = preview
 else
     reacoma.settings.slice_preview = false
     reacoma.settings.immediate_preview = false
