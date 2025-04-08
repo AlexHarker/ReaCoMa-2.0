@@ -125,7 +125,24 @@ helpers.process = function(obj, mode, optional_item_bundle)
 
             if mode == 'split' then
                 for j=1, #take_markers do
-                    item = r.SplitMediaItem(item, take_markers[j])
+                    result = r.SplitMediaItem(item, take_markers[j])
+                    if result ~= nil then
+                        item = result
+                    end
+                end
+            elseif mode == 'chop' then
+                for j=1, (#take_markers / 2) do
+                    local idx = (j - 1) * 2 + 1 
+                    result = r.SplitMediaItem(item, take_markers[idx])
+                    if result ~= nil then
+                        r.DeleteTrackMediaItem(r.GetMediaItem_Track(item), item)
+                        item = result
+                    end
+                    item = r.SplitMediaItem(item, take_markers[idx + 1])
+                end
+                -- If there is an item left over, delete it
+                if item ~= nil then
+                    r.DeleteTrackMediaItem(r.GetMediaItem_Track(item), item)
                 end
             elseif mode == 'marker' then
                 for j=1, #take_markers do
