@@ -31,7 +31,7 @@ helpers.draw_gui = function(ctx, obj)
     for _, param in pairs(obj.parameters) do
         if param.widget == r.ImGui_SliderInt then
             rv, param.value = 
-                param.widget(ctx, param.name, param.value, param.min, param.max)
+                param.widget(ctx, param.name, param.value, param.min, param.max, '%d', param.flag or 0)
         elseif param.widget == r.ImGui_SliderDouble then
             rv, param.value = param.widget(ctx, 
                 param.name, param.value, param.min, param.max, '%.3f', param.flag or 0)
