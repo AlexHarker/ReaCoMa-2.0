@@ -90,13 +90,6 @@ function segment(parameters)
         local retcleaned = string.gsub(retval, "^.*results ", "")
         retcleaned = string.gsub(retcleaned, " \n$", "")
         results = split_results(retcleaned, " ")
-
-    local output_file = io.open("Users/alexharker/Downloads/results.txt", "w")
-    output_file:write(retcleaned .. "\n")
-    for index, result in ipairs(results) do
-        output_file:write(index .. ": " .. result .. "\n")
-    end
-    output_file:close()
     
         slicing.do_onsets_and_offsets(results, data)
 
@@ -112,6 +105,7 @@ quickedit = {
         algorithm_name = 'Quick Edit',
         ext_name = 'reacoma.quickedit',
         action = 'segment'
+        offsets = true
     },
     parameters =  {
         {
