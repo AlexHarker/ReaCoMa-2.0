@@ -55,7 +55,8 @@ local ampgate = {
     info = {
         algorithm_name = 'Ampgate Slicing',
         ext_name = 'reacoma.ampgate',
-        action = 'segment'
+        action = 'segment',
+        offsets = true
     },
     parameters =  {
         {

@@ -23,7 +23,11 @@ wrapper.loop = function(args)
         if args.obj.info.source_target_matrix == true then
             args.state = reacoma.imgui.helpers.process(args.obj, 'cross', swap_items)
         else
-            args.state = reacoma.imgui.helpers.process(args.obj, 'split')
+            if args.obj.info.offsets then
+                args.state = reacoma.imgui.helpers.process(args.obj, 'chop')
+            else
+                args.state = reacoma.imgui.helpers.process(args.obj, 'split')
+            end 
         end
     end
 
@@ -31,6 +35,12 @@ wrapper.loop = function(args)
         r.ImGui_SameLine(args.ctx)
         if r.ImGui_Button(args.ctx, 'create markers') then
             args.state = reacoma.imgui.helpers.process(args.obj, 'marker')
+        end
+        if args.obj.info.offsets then
+            r.ImGui_SameLine(args.ctx)
+                if r.ImGui_Button(args.ctx, 'create regions') then
+                args.state = reacoma.imgui.helpers.process(args.obj, 'region')
+            end
         end
         
         r.ImGui_SameLine(args.ctx)
