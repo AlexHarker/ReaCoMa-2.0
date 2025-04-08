@@ -54,8 +54,6 @@ wrapper.loop = function(args)
         reacoma.settings.immediate_preview = false
     end
 
-    args.state = reacoma.imgui.helpers.update_state(args.ctx, args.obj, restored)
-
     -- TODO: don't rely here on duplication of code
     -- reacoma.imgui.helpers.matrix_gui(args, rt_items, swap_items)
     if args.obj.info.source_target_matrix == true then 
@@ -116,6 +114,8 @@ wrapper.loop = function(args)
             restored = true
         end
     end
+
+    args.state = reacoma.imgui.helpers.update_state(args.ctx, args.obj, restored)
 
     -- TODO: Preset System
     -- if r.ImGui_CollapsingHeader(ctx, 'Presets', nil, r.ImGui_TreeNodeFlags_None()) then
