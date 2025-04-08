@@ -46,6 +46,7 @@ wrapper.loop = function(args)
         r.ImGui_SameLine(args.ctx)
         _, reacoma.settings.slice_preview = r.ImGui_Checkbox(args.ctx,'preview',reacoma.settings.slice_preview)
         if not reacoma.settings.slice_preview then r.ImGui_BeginDisabled(args.ctx) end
+        if _ and reacoma.settings.slice_preview then restored = true end
         r.ImGui_SameLine(args.ctx)
         _,  reacoma.settings.immediate_preview = r.ImGui_Checkbox(args.ctx,'immediate',reacoma.settings.immediate_preview)
         if not reacoma.settings.slice_preview then r.ImGui_EndDisabled(args.ctx) end
