@@ -135,8 +135,8 @@ quickedit = {
             min = 1,
             max = 400,
             value = 6.25,
-            type = 'sliderdouble',
-            desc = 'The window time for averaging.'
+            desc = 'The window time for averaging.',
+            flag = reaper.ImGui_SliderFlags_AlwaysClamp()
         },
         {
             name = 'peak_ms',
@@ -144,15 +144,14 @@ quickedit = {
             min = 1,
             max = 400,
             value = 12.5,
-            type = 'sliderdouble',
-            desc = 'The window time for peak finding.'
+            desc = 'The window time for peak finding.',
+            flag = reaper.ImGui_SliderFlags_AlwaysClamp()
         },
         {
             name = 'type',
             widget = reaper.ImGui_Combo,
             value = 1,
             items = 'rms\0rms_hann\0mean\0mean_hann\0',
-            type = 'combo',
             desc = 'The average type.'
         },
         {
@@ -160,7 +159,6 @@ quickedit = {
             widget = reaper.ImGui_Combo,
             value = 0,
             items = 'off\0on\0',
-            type = 'combo',
             desc = 'Log Mode.'
         },
         {
@@ -169,8 +167,8 @@ quickedit = {
             min = 1,
             max = 25,
             value = 4,
-            type = 'sliderint',
-            desc = 'The integer value to reduce by.'
+            desc = 'The integer value to reduce by.',
+            flag = reaper.ImGui_SliderFlags_AlwaysClamp()
         },
         {
             name = 'search_ms',
@@ -178,8 +176,8 @@ quickedit = {
             min = 1,
             max = 1000,
             value = 40,
-            type = 'sliderdouble',
-            desc = 'The window time for searching.'
+            desc = 'The window time for searching.',
+            flag = reaper.ImGui_SliderFlags_AlwaysClamp()
         },
         {
             name = 'hold_ms',
@@ -187,8 +185,8 @@ quickedit = {
             min = 1,
             max = 1000,
             value = 140,
-            type = 'sliderdouble',
-            desc = 'The window time for holding.'
+            desc = 'The window time for holding.',
+            flag = reaper.ImGui_SliderFlags_AlwaysClamp()
         },
         {
             name = 'threshold',
@@ -196,8 +194,8 @@ quickedit = {
             min = 0,
             max = 50,
             value = 20,
-            type = 'sliderdouble',
-            desc = 'The threshold in dB relative to the minimum average.'
+            desc = 'The threshold in dB relative to the minimum average.',
+            flag = reaper.ImGui_SliderFlags_AlwaysClamp()
         },
         {
             name = 'percentage',
@@ -205,8 +203,8 @@ quickedit = {
             min = 0,
             max = 100,
             value = 50,
-            type = 'sliderdouble',
-            desc = 'The percentage of samples that would need to be above the threshold.'
+            desc = 'The percentage of samples that would need to be above the threshold.',
+            flag = reaper.ImGui_SliderFlags_AlwaysClamp()
         },
         {
             name = 'min_length',
@@ -214,8 +212,8 @@ quickedit = {
             min = 0,
             max = 2000,
             value = 300,
-            type = 'sliderdouble',
-            desc = 'The minimum detection length.'
+            desc = 'The minimum detection length.',
+            flag = reaper.ImGui_SliderFlags_AlwaysClamp()
         },
         {
             name = 'min_level',
@@ -223,8 +221,8 @@ quickedit = {
             min = 0,
             max = 100,
             value = 20,
-            type = 'sliderdouble',
-            desc = 'The minimum detection level for a segment.'
+            desc = 'The minimum detection level for a segment.',
+            flag = reaper.ImGui_SliderFlags_AlwaysClamp()
         },
     },
     perform_update = segment
