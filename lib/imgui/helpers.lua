@@ -153,7 +153,7 @@ helpers.process = function(obj, mode, optional_item_bundle)
             elseif mode == 'region' then
                 for j=1, (#take_markers / 2) do
                     local idx = (j - 1) * 2 + 1 
-                    local color = take_marker_colors[idx] 
+                    local color = 0 
                     r.AddProjectMarker2(0, true, take_markers[idx], take_markers[idx + 1], '', -1, color)
                 end
             end
